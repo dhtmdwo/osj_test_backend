@@ -1,29 +1,44 @@
 package com.example.osj_test_backend.board;
 
-import com.example.osj_test_backend.board.model.Board;
-import com.example.osj_test_backend.board.model.BoardDto;
+import com.example.osj_test_backend.board.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class BoardService {
     private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
     public void register(BoardDto.BoardRegister dto) {
         Board board = boardRepository.save(dto.toEntity());
     }
 
-    public List<BoardDto.BoardResponse> list() {
-        List<Board> boardList = boardRepository.findAll();
-        return boardList.stream().map(BoardDto.BoardResponse::from).collect(Collectors.toList());
+    public void registerComment(CommentDto.CommentRegister dto) {
+        Board board = boardRepository.findById(dto.getBoardId()).orElse(null);
+        Comment comment = commentRepository.save(dto.toEntity(board));
     }
 
-    public BoardDto.BoardResponse read(Long boardIdx) {
+    public List<BoardDto.BoardListRes> list() {
+        List<Board> boardList = boardRepository.findAll();
+        List<BoardDto.BoardListRes> responseList = new ArrayList<>();
+        for (Board board : boardList) {
+            List<Comment> commentList = board.getCommentList();
+            int commentNum = commentList.size();
+            responseList.add(BoardDto.BoardListRes.from(board, commentNum));
+        }
+        return responseList;
+
+    }
+
+    public BoardDto.BoardRes read(Long boardIdx) {
         Board board = boardRepository.findById(boardIdx).orElseThrow();
-        return BoardDto.BoardResponse.from(board);
+        List<Comment> commentList = board.getCommentList();
+        BoardDto.BoardRes response = BoardDto.BoardRes.from(board, commentList);
+
+        return response;
     }
 
 }
