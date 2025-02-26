@@ -28,6 +28,7 @@ public class BoardDto {
     @AllArgsConstructor
     @Builder
     public static class BoardListRes {
+        private Long idx;
         private String title;
         private String content;
         private String writer;
@@ -35,6 +36,7 @@ public class BoardDto {
 
         public static BoardListRes from(Board board, int commentNum) {
             return BoardListRes.builder()
+                    .idx(board.getIdx())
                     .title(board.getTitle())
                     .content(board.getContent())
                     .writer(board.getWriter())
@@ -49,6 +51,7 @@ public class BoardDto {
     @AllArgsConstructor
     @Builder
     public static class BoardRes {
+        private Long idx;
         private String title;
         private String content;
         private String writer;
@@ -61,6 +64,7 @@ public class BoardDto {
             }
 
             return BoardRes.builder()
+                    .idx(board.getIdx())
                     .title(board.getTitle())
                     .content(board.getContent())
                     .writer(board.getWriter())
